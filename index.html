@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>🖼️ Easy Bitmap Maker 🖼️</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="favicon.ico">
+</head>
+<body>
+    <div id="localization">
+        <button id="lang-switch">🇺🇸 English</button>
+    </div>
+    <h1 id="title">🖼️ Easy Bitmap Maker 🖼️</h1>
+    <div id="controls">
+        <label for="width" id="width-label">Width:</label>
+        <input type="number" id="width" min="1" max="128" value="16">
+        <label for="height" id="height-label">Height:</label>
+        <input type="number" id="height" min="1" max="128" value="16">
+        <label for="pen-size" id="pen-size-label">Pen Size:</label>
+        <input type="range" id="pen-size" min="1" max="10" value="1">
+        <span id="pen-size-value">1</span>px
+        <button id="generate-grid">🪄 Create Grid</button>
+        <button id="invert-colors">🔄 Invert Colors</button>
+        <button id="import-bitmap">📥 Import Bitmap</button>
+        <button id="clear-grid">🗑️ Clear Grid</button>
+        <button id="help-button">❓ Help</button>
+    </div>
+    <div id="modes">
+        <button id="mode-fill" class="mode-button active">🖌️ Fill</button>
+        <button id="mode-erase" class="mode-button">🧹 Erase</button>
+    </div>
+    <div id="grid-container"></div>
+    <button id="generate-code">💾 Generate C++ Code</button>
+    <div id="cpp-code-container" style="display:none;">
+        <h2 id="cpp-code-title">📄 Generated C++ Code</h2>
+        <button id="generate-bitmap">📋 Copy Code</button>
+        <pre id="cpp-code"></pre>
+    </div>
+    <div id="message-container"></div>
+    <div id="links">
+        <a href="https://t.me/rokokoschannel" target="_blank">✈️ Telegram</a>
+        <a href="https://github.com/rokokol" target="_blank">🐙 GitHub</a>
+        <a href="https://www.youtube.com/@ilyushechka" target="_blank">📹 YouTube</a>
+    </div>
+    <div id="star-github">
+        ⭐ If you like this project, please <a href="https://github.com/rokokol/easy-bitmap.github.io" target="_blank">star it on GitHub</a>!
+    </div>
+
+    <!-- Help Modal -->
+    <div id="help-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>📖 Help</h2>
+            <p>Welcome to the Easy Bitmap Maker! Here's how to use the tool:</p>
+            <ul>
+                <li>🪄 <strong>Create Grid:</strong> Set the width and height (up to 128) and click to generate the grid</li>
+                <li>🖌️ <strong>Fill Mode:</strong> LMB draws pixels, RMB erases pixels</li>
+                <li>🧹 <strong>Erase Mode:</strong> LMB erases pixels, RMB draws pixels</li>
+                <li>🎨 <strong>Pen Size:</strong> Adjust the pen size using the slider for larger or smaller brush strokes</li>
+                <li>📥 <strong>Import Bitmap:</strong> Click to import a bitmap from C++ code</li>
+                <li>💾 <strong>Generate C++ Code:</strong> Click to generate and view the C++ byte array representing your bitmap</li>
+                <li>📋 <strong>Copy Code:</strong> Click to copy the generated C++ code to your clipboard</li>
+                <li>🔄 <strong>Invert Colors:</strong> Click to invert the colors of all pixels</li>
+                <li>🗑️ <strong>Clear Grid:</strong> Click to clear all pixels in the grid</li>
+                <li>🔑 <strong>Hotkeys:</strong> Press <strong>D</strong> for Fill mode and <strong>E</strong> for Erase mode</li>
+                <li>❓ <strong>Help:</strong> Click the Help button to view these instructions</li>
+                <li>🌐 <strong>Language:</strong> Toggle between English and Russian using the button in the top-right corner</li>
+                <li>⭐ <strong>Support:</strong> If you like this project, please star it on GitHub</li>
+            </ul>
+            <p>Happy creating!</p>
+        </div>
+    </div>
+
+    <!-- Import Bitmap Modal -->
+    <div id="import-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>📥 Import Bitmap</h2>
+            <p>Paste your C++ bitmap code or array content below:</p>
+            <textarea id="import-textarea" placeholder="e.g., 0x00, 0xFF, 0xAA"></textarea>
+            <button id="import-confirm">📥 Import</button>
+        </div>
+    </div>
+
+    <!-- Copy Success Modal -->
+    <div id="copy-success-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2>✅ Success</h2>
+            <p>Code copied to clipboard!</p>
+        </div>
+    </div>
+
+    <!-- Message Modal -->
+    <div id="message-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2 id="message-modal-title"></h2>
+            <p id="message-modal-text"></p>
+            <button id="message-ok-button" class="message-ok-button">OK</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
