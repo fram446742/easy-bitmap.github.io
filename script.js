@@ -39,6 +39,12 @@ document.addEventListener('DOMContentLoaded', () => {
     let gridWidth = 16;
     let gridHeight = 16;
 
+    // Стек для отмены действий
+    const undoStack = [];
+
+    // Переменная для текущего действия
+    let currentAction = null;
+
     // Event Listeners
     generateGridButton.addEventListener('click', createGrid);
     penSizeSlider.addEventListener('input', updatePenSize);
@@ -102,6 +108,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 closeModal(messageModal);
             }
         }
+
+        // Обработка Ctrl + Z независимо от раскладки
+        if ((e.ctrlKey || e.metaKey) && e.code === 'KeyZ') {
+            e.preventDefault();
+            undo();
+        }
     });
 
     // Prevent default context menu
@@ -132,77 +144,60 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Added wheel event listeners for inputs
-    widthInput.addEventListener('wheel', (e) => {
-        e.preventDefault();
-        const delta = e.deltaY < 0 ? 1 : -1;
-        let newValue = parseInt(widthInput.value) + delta;
-        if (newValue >= parseInt(widthInput.min) && newValue <= parseInt(widthInput.max)) {
-            widthInput.value = newValue;
-            gridWidth = newValue;
-            createGrid();
+    // Функция для записи изменений в текущем действии
+    function recordChange(cell, previousState) {
+        if (!currentAction) return;
+        const cellKey = `${cell.dataset.x},${cell.dataset.y}`;
+        if (!currentAction.changes.has(cellKey)) {
+            currentAction.changes.set(cellKey, previousState);
         }
-    });
+    }
 
-    heightInput.addEventListener('wheel', (e) => {
-        e.preventDefault();
-        const delta = e.deltaY < 0 ? 1 : -1;
-        let newValue = parseInt(heightInput.value) + delta;
-        if (newValue >= parseInt(heightInput.min) && newValue <= parseInt(heightInput.max)) {
-            heightInput.value = newValue;
-            gridHeight = newValue;
-            createGrid();
-        }
-    });
-
-    // Mouse events for drawing
-    gridContainer.addEventListener('mousedown', (e) => {
-        if (e.target.classList.contains('cell')) {
-            if (e.button === 0) { // Left mouse button
-                isLeftMouseDown = true;
-                isDrawing = true;
-                handleDrawing(e.target, 'left');
-            } else if (e.button === 2) { // Right mouse button
-                isRightMouseDown = true;
-                isDrawing = true;
-                handleDrawing(e.target, 'right');
+    // Модифицированные функции заполнения и стирания
+    function fillCells(cell) {
+        const x = parseInt(cell.dataset.x);
+        const y = parseInt(cell.dataset.y);
+        const halfPen = Math.floor(penSize / 2);
+        for (let dy = -halfPen; dy <= halfPen; dy++) {
+            for (let dx = -halfPen; dx <= halfPen; dx++) {
+                const nx = x + dx;
+                const ny = y + dy;
+                if (nx >= 0 && nx < gridWidth && ny >= 0 && ny < gridHeight) {
+                    const index = ny * gridWidth + nx;
+                    const targetCell = gridContainer.children[index];
+                    if (targetCell) {
+                        const isActive = targetCell.classList.contains('active');
+                        if (!isActive) {
+                            // Записываем предыдущее состояние
+                            recordChange(targetCell, false);
+                            targetCell.classList.add('active');
+                        }
+                    }
+                }
             }
         }
-    });
+    }
 
-    gridContainer.addEventListener('mouseup', (e) => {
-        if (e.button === 0) {
-            isLeftMouseDown = false;
-        } else if (e.button === 2) {
-            isRightMouseDown = false;
-        }
-        if (!isLeftMouseDown && !isRightMouseDown) {
-            isDrawing = false;
-        }
-    });
-
-    gridContainer.addEventListener('mouseover', (e) => {
-        if (isDrawing && e.target.classList.contains('cell')) {
-            if (isLeftMouseDown) {
-                handleDrawing(e.target, 'left');
-            } else if (isRightMouseDown) {
-                handleDrawing(e.target, 'right');
-            }
-        }
-    });
-
-    function handleDrawing(cell, button) {
-        if (currentMode === 'fill') {
-            if (button === 'left') {
-                fillCells(cell);
-            } else if (button === 'right') {
-                eraseCells(cell);
-            }
-        } else if (currentMode === 'erase') {
-            if (button === 'left') {
-                eraseCells(cell);
-            } else if (button === 'right') {
-                fillCells(cell);
+    function eraseCells(cell) {
+        const x = parseInt(cell.dataset.x);
+        const y = parseInt(cell.dataset.y);
+        const halfPen = Math.floor(penSize / 2);
+        for (let dy = -halfPen; dy <= halfPen; dy++) {
+            for (let dx = -halfPen; dx <= halfPen; dx++) {
+                const nx = x + dx;
+                const ny = y + dy;
+                if (nx >= 0 && nx < gridWidth && ny >= 0 && ny < gridHeight) {
+                    const index = ny * gridWidth + nx;
+                    const targetCell = gridContainer.children[index];
+                    if (targetCell) {
+                        const isActive = targetCell.classList.contains('active');
+                        if (isActive) {
+                            // Записываем предыдущее состояние
+                            recordChange(targetCell, true);
+                            targetCell.classList.remove('active');
+                        }
+                    }
+                }
             }
         }
     }
@@ -268,44 +263,6 @@ document.addEventListener('DOMContentLoaded', () => {
         cppCodeContainer.style.display = 'none';
     }
 
-    function fillCells(cell) {
-        const x = parseInt(cell.dataset.x);
-        const y = parseInt(cell.dataset.y);
-        const halfPen = Math.floor(penSize / 2);
-        for (let dy = -halfPen; dy <= halfPen; dy++) {
-            for (let dx = -halfPen; dx <= halfPen; dx++) {
-                const nx = x + dx;
-                const ny = y + dy;
-                if (nx >= 0 && nx < gridWidth && ny >= 0 && ny < gridHeight) {
-                    const index = ny * gridWidth + nx;
-                    const targetCell = gridContainer.children[index];
-                    if (targetCell && !targetCell.classList.contains('active')) {
-                        targetCell.classList.add('active');
-                    }
-                }
-            }
-        }
-    }
-
-    function eraseCells(cell) {
-        const x = parseInt(cell.dataset.x);
-        const y = parseInt(cell.dataset.y);
-        const halfPen = Math.floor(penSize / 2);
-        for (let dy = -halfPen; dy <= halfPen; dy++) {
-            for (let dx = -halfPen; dx <= halfPen; dx++) {
-                const nx = x + dx;
-                const ny = y + dy;
-                if (nx >= 0 && nx < gridWidth && ny >= 0 && ny < gridHeight) {
-                    const index = ny * gridWidth + nx;
-                    const targetCell = gridContainer.children[index];
-                    if (targetCell && targetCell.classList.contains('active')) {
-                        targetCell.classList.remove('active');
-                    }
-                }
-            }
-        }
-    }
-
     function updatePenSize() {
         penSize = parseInt(penSizeSlider.value);
         penSizeValue.textContent = penSize;
@@ -366,6 +323,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function invertColors() {
         const cells = gridContainer.getElementsByClassName('cell');
         for (let cell of cells) {
+            // Записываем предыдущее состояние для каждой ячейки
+            recordChange(cell, cell.classList.contains('active'));
             cell.classList.toggle('active');
         }
     }
@@ -373,7 +332,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function clearGrid() {
         const cells = gridContainer.getElementsByClassName('cell');
         for (let cell of cells) {
-            cell.classList.remove('active');
+            if (cell.classList.contains('active')) {
+                // Записываем предыдущее состояние
+                recordChange(cell, true);
+                cell.classList.remove('active');
+            }
         }
         // Hide the generated code when grid is cleared
         cppCodeContainer.style.display = 'none';
@@ -589,8 +552,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const cell = cells[bitIndex];
                 const isActive = (byteValue >> i) & 1;
                 if (isActive) {
+                    // Записываем предыдущее состояние
+                    recordChange(cell, false);
                     cell.classList.add('active');
                 } else {
+                    // Записываем предыдущее состояние
+                    recordChange(cell, true);
                     cell.classList.remove('active');
                 }
                 bitIndex++;
@@ -622,5 +589,95 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize grid on page load
     createGrid();
+
+    // Mouse events for drawing
+    gridContainer.addEventListener('mousedown', (e) => {
+        if (e.target.classList.contains('cell')) {
+            if (e.button === 0) { // Left mouse button
+                isLeftMouseDown = true;
+                isDrawing = true;
+                // Начинаем новое действие
+                currentAction = {
+                    changes: new Map()
+                };
+                handleDrawing(e.target, 'left');
+            } else if (e.button === 2) { // Right mouse button
+                isRightMouseDown = true;
+                isDrawing = true;
+                // Начинаем новое действие
+                currentAction = {
+                    changes: new Map()
+                };
+                handleDrawing(e.target, 'right');
+            }
+        }
+    });
+
+    gridContainer.addEventListener('mouseup', (e) => {
+        if (e.button === 0) {
+            isLeftMouseDown = false;
+        } else if (e.button === 2) {
+            isRightMouseDown = false;
+        }
+        if (!isLeftMouseDown && !isRightMouseDown) {
+            isDrawing = false;
+            if (currentAction && currentAction.changes.size > 0) {
+                // Добавляем действие в стек отмены
+                undoStack.push(currentAction);
+                // Ограничение размера стека (например, 100 действий)
+                if (undoStack.length > 100) {
+                    undoStack.shift();
+                }
+                currentAction = null;
+            }
+        }
+    });
+
+    gridContainer.addEventListener('mouseover', (e) => {
+        if (isDrawing && e.target.classList.contains('cell')) {
+            if (isLeftMouseDown) {
+                handleDrawing(e.target, 'left');
+            } else if (isRightMouseDown) {
+                handleDrawing(e.target, 'right');
+            }
+        }
+    });
+
+    function handleDrawing(cell, button) {
+        if (currentMode === 'fill') {
+            if (button === 'left') {
+                fillCells(cell);
+            } else if (button === 'right') {
+                eraseCells(cell);
+            }
+        } else if (currentMode === 'erase') {
+            if (button === 'left') {
+                eraseCells(cell);
+            } else if (button === 'right') {
+                fillCells(cell);
+            }
+        }
+    }
+
+    // Функция отмены последнего действия
+    function undo() {
+        if (undoStack.length === 0) {
+            return;
+        }
+
+        const lastAction = undoStack.pop();
+        for (let [key, prevState] of lastAction.changes.entries()) {
+            const [x, y] = key.split(',').map(Number);
+            const index = y * gridWidth + x;
+            const cell = gridContainer.children[index];
+            if (cell) {
+                if (prevState) {
+                    cell.classList.add('active');
+                } else {
+                    cell.classList.remove('active');
+                }
+            }
+        }
+    }
 });
 
