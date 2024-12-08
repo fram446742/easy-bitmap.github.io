@@ -12,23 +12,35 @@
     </div>
     <h1 id="title">🖼️ Easy Bitmap Maker 🖼️</h1>
     <div id="controls">
-        <label for="width" id="width-label">Width:</label>
-        <input type="number" id="width" min="1" max="128" value="16">
-        <label for="height" id="height-label">Height:</label>
-        <input type="number" id="height" min="1" max="128" value="16">
+        <label for="bitmap-type" id="bitmap-type-label">Bitmap Type:</label>
+        <select id="bitmap-type">
+            <option value="uint8_t">uint8_t (8x8)</option>
+            <option value="uint16_t">uint16_t (16x16)</option>
+            <option value="uint32_t">uint32_t (32x32)</option>
+            <option value="uint64_t">uint64_t (64x64)</option>
+        </select>
+        
         <label for="pen-size" id="pen-size-label">Pen Size:</label>
         <input type="range" id="pen-size" min="1" max="10" value="1">
         <span id="pen-size-value">1</span>px
-        <button id="generate-grid">🪄 Create Grid</button>
+        
         <button id="invert-colors">🔄 Invert Colors</button>
         <button id="import-bitmap">📥 Import Bitmap</button>
         <button id="clear-grid">🗑️ Clear Grid</button>
         <button id="help-button">❓ Help</button>
     </div>
+
     <div id="modes">
         <button id="mode-fill" class="mode-button active">🖌️ Fill</button>
         <button id="mode-erase" class="mode-button">🧹 Erase</button>
     </div>
+
+    <div id="transform-controls" style="text-align:center; margin-bottom:20px;">
+        <button id="rotate-90">↩️ Rotate 90°</button>
+        <button id="flip-horizontal">↔️ Flip Horizontal</button>
+        <button id="flip-vertical">↕️ Flip Vertical</button>
+    </div>
+
     <div id="grid-container"></div>
     <button id="generate-code">💾 Generate C++ Code</button>
     <div id="cpp-code-container" style="display:none;">
@@ -46,52 +58,49 @@
         ⭐ If you like this project, please <a href="https://github.com/rokokol/easy-bitmap.github.io" target="_blank">star it on GitHub</a>!
     </div>
 
-    <!-- Help Modal -->
     <div id="help-modal" class="modal">
         <div class="modal-content">
             <span class="close-button">&times;</span>
             <h2>📖 Help</h2>
-            <p>Welcome to the Easy Bitmap Maker! Here's how to use the tool:</p>
-            <ul>
-                <li>🪄 <strong>Create Grid:</strong> Set the width and height (up to 128) and click to generate the grid</li>
-                <li>🖌️ <strong>Fill Mode:</strong> LMB draws pixels, RMB erases pixels</li>
-                <li>🧹 <strong>Erase Mode:</strong> LMB erases pixels, RMB draws pixels</li>
-                <li>🎨 <strong>Pen Size:</strong> Adjust the pen size using the slider for larger or smaller brush strokes</li>
-                <li>📥 <strong>Import Bitmap:</strong> Click to import a bitmap from C++ code</li>
-                <li>💾 <strong>Generate C++ Code:</strong> Click to generate and view the C++ byte array representing your bitmap</li>
-                <li>📋 <strong>Copy Code:</strong> Click to copy the generated C++ code to your clipboard</li>
-                <li>🔄 <strong>Invert Colors:</strong> Click to invert the colors of all pixels</li>
-                <li>🗑️ <strong>Clear Grid:</strong> Click to clear all pixels in the grid</li>
-                <li>🔑 <strong>Hotkeys:</strong> Press <strong>D</strong> for Fill mode and <strong>E</strong> for Erase mode</li>
-                <li>❓ <strong>Help:</strong> Click the Help button to view these instructions</li>
-                <li>🌐 <strong>Language:</strong> Toggle between English and Russian using the button in the top-right corner</li>
-                <li>⭐ <strong>Support:</strong> If you like this project, please star it on GitHub</li>
+            <p id="help-intro">Welcome to the Easy Bitmap Maker! Here's how to use the tool:</p>
+            <ul id="help-list">
+                <li class="help-fill-mode">🖌️ <strong>Fill Mode:</strong> LMB draws pixels, RMB erases pixels</li>
+                <li class="help-erase-mode">🧹 <strong>Erase Mode:</strong> LMB erases pixels, RMB draws pixels</li>
+                <li class="help-pen-size">🎨 <strong>Pen Size:</strong> Adjust the pen size using the slider</li>
+                <li class="help-import-bitmap">📥 <strong>Import Bitmap:</strong> Import from C++ code. If size differs, it tries to adjust automatically.</li>
+                <li class="help-generate-code">💾 <strong>Generate C++ Code:</strong> View the C++ array</li>
+                <li class="help-copy-code">📋 <strong>Copy Code:</strong> Copy the generated code</li>
+                <li class="help-invert-colors">🔄 <strong>Invert Colors:</strong> Invert all pixels</li>
+                <li class="help-clear-grid">🗑️ <strong>Clear Grid:</strong> Clear all pixels</li>
+                <li class="help-hotkeys">🔑 <strong>Hotkeys:</strong> <strong>D</strong> for Fill, <strong>E</strong> for Erase</li>
+                <li class="help-rotate">↩️ <strong>Rotate 90°:</strong> Rotate the bitmap by 90 degrees clockwise</li>
+                <li class="help-flip-h">↔️ <strong>Flip Horizontal:</strong> Flip the bitmap horizontally</li>
+                <li class="help-flip-v">↕️ <strong>Flip Vertical:</strong> Flip the bitmap vertically</li>
+                <li class="help-language">🌐 <strong>Language:</strong> Toggle between English and Russian</li>
+                <li class="help-support">⭐ <strong>Support:</strong> If you like this project, star it on GitHub</li>
             </ul>
-            <p>Happy creating!</p>
+            <p id="help-outro">Happy creating!</p>
         </div>
     </div>
 
-    <!-- Import Bitmap Modal -->
     <div id="import-modal" class="modal">
         <div class="modal-content">
             <span class="close-button">&times;</span>
-            <h2>📥 Import Bitmap</h2>
-            <p>Paste your C++ bitmap code or array content below:</p>
+            <h2 id="import-title">📥 Import Bitmap</h2>
+            <p id="import-instr">Paste your C++ bitmap code or array content below:</p>
             <textarea id="import-textarea" placeholder="e.g., 0x00, 0xFF, 0xAA"></textarea>
             <button id="import-confirm">📥 Import</button>
         </div>
     </div>
 
-    <!-- Copy Success Modal -->
     <div id="copy-success-modal" class="modal">
         <div class="modal-content">
             <span class="close-button">&times;</span>
-            <h2>✅ Success</h2>
-            <p>Code copied to clipboard!</p>
+            <h2 id="copy-success-title">✅ Success</h2>
+            <p id="copy-success-text">Code copied to clipboard!</p>
         </div>
     </div>
 
-    <!-- Message Modal -->
     <div id="message-modal" class="modal">
         <div class="modal-content">
             <span class="close-button">&times;</span>

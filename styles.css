@@ -1,11 +1,9 @@
-/* styles.css */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
     background-color: #f0f4f8;
 }
 
-/* Localization Button */
 #localization {
     position: absolute;
     top: 10px;
@@ -28,10 +26,6 @@ body {
     background-color: #005fa3;
 }
 
-#lang-switch span {
-    margin-left: 5px;
-}
-
 h1 {
     text-align: center;
     color: #333;
@@ -48,11 +42,12 @@ h1 {
     font-size: 16px;
 }
 
-#width, #height {
-    width: 60px;
-    border-radius: 8px;
+#bitmap-type {
     padding: 5px;
+    border-radius: 8px;
     border: 1px solid #ccc;
+    font-size: 16px;
+    margin: 0 10px;
 }
 
 #pen-size {
@@ -187,22 +182,6 @@ input[type="range"]::-moz-range-thumb {
     background-color: #6ec6ff;
 }
 
-#generate-grid {
-    padding: 10px 20px;
-    margin-left: 10px;
-    background-color: #007acc;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s;
-}
-
-#generate-grid:hover {
-    background-color: #005fa3;
-}
-
 #generate-code {
     display: block;
     margin: 20px auto;
@@ -312,7 +291,6 @@ input[type="range"]::-moz-range-thumb {
     background-color: rgba(0, 122, 204, 0.1);
 }
 
-/* Modal Styles */
 .modal {
     display: none;
     position: fixed;
@@ -395,7 +373,6 @@ input[type="range"]::-moz-range-thumb {
     background-color: #005fa3;
 }
 
-/* Message Modal Custom Styles */
 #message-modal .modal-content {
     text-align: center;
 }
@@ -403,7 +380,7 @@ input[type="range"]::-moz-range-thumb {
 #message-ok-button {
     margin-top: 20px;
     padding: 10px 20px;
-    background-color: #007acc; /* Default Blue */
+    background-color: #007acc;
     color: #fff;
     border: none;
     border-radius: 8px;
@@ -436,7 +413,6 @@ input[type="range"]::-moz-range-thumb {
     to { transform: translateY(-50px); }
 }
 
-/* Closing Modal Animations */
 .modal.fade-out {
     animation: fadeOut 0.5s forwards;
 }
@@ -445,11 +421,25 @@ input[type="range"]::-moz-range-thumb {
     animation: slideOut 0.5s forwards;
 }
 
-/* Prevent text selection in the grid */
 #grid-container, #grid-container * {
-    -webkit-user-select: none; /* Safari */
-    -moz-user-select: none;    /* Firefox */
-    -ms-user-select: none;     /* IE10+/Edge */
-    user-select: none;         /* Standard */
+    -webkit-user-select: none; 
+    -moz-user-select: none;    
+    -ms-user-select: none;     
+    user-select: none;         
+}
+
+#rotate-90, #flip-horizontal, #flip-vertical {
+    padding: 10px 20px;
+    margin: 5px;
+    background-color: #007acc;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+#rotate-90:hover, #flip-horizontal:hover, #flip-vertical:hover {
+    background-color: #005fa3;
 }
 
