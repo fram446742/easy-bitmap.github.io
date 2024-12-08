@@ -225,8 +225,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         }
-        const type = bitmapTypeSelect.value
-        const cppCode = type + ' bitmap[] = {\n    ' + cppArray.join(', ') + '\n};'
+        // const type = bitmapTypeSelect.value
+        const cppCode = 'uint8_t bitmap[] = {\n    ' + cppArray.join(', ') + '\n};'
         cppCodeElement.textContent = cppCode
         cppCodeContainer.style.display = 'block'
     }
