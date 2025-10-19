@@ -1,116 +1,170 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>🖼️ Easy Bitmap Maker 🖼️</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="icon" href="favicon.ico">
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <title>🖼️ Easy Bitmap Maker/Editor 🖼️</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="icon" href="favicon.ico" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
     <div id="localization">
-        <button id="lang-switch">🇺🇸 English</button>
+      <select id="lang-switch">
+        <option value="en">🇺🇸 English</option>
+        <option value="ru">🇷🇺 Русский</option>
+        <option value="es">🇪🇸 Español</option>
+        <option value="fr">🇫🇷 Français</option>
+        <option value="de">🇩🇪 Deutsch</option>
+      </select>
     </div>
-    <h1 id="title">🖼️ Easy Bitmap Maker 🖼️</h1>
+    <h1 id="title">🖼️ Easy Bitmap Maker/Editor 🖼️</h1>
     <div id="controls">
-        <label for="bitmap-type" id="bitmap-type-label">Bitmap Type:</label>
-        <select id="bitmap-type">
-            <option value="uint8_t">uint8_t (8x8)</option>
-            <option value="uint16_t">uint16_t (16x16)</option>
-            <option value="uint32_t">uint32_t (32x32)</option>
-            <option value="uint64_t">uint64_t (64x64)</option>
-        </select>
-        
-        <label for="pen-size" id="pen-size-label">Pen Size:</label>
-        <input type="range" id="pen-size" min="1" max="10" value="1">
-        <span id="pen-size-value">1</span>px
-        
-        <button id="invert-colors">🔄 Invert Colors</button>
-        <button id="import-bitmap">📥 Import Bitmap</button>
-        <button id="clear-grid">🗑️ Clear Grid</button>
-        <button id="help-button">❓ Help</button>
+      <label for="bitmap-width" id="bitmap-width-label">Width:</label>
+      <input type="number" id="bitmap-width" min="1" max="128" value="8" />
+      <label for="bitmap-height" id="bitmap-height-label">Height:</label>
+      <input type="number" id="bitmap-height" min="1" max="128" value="8" />
+
+      <label for="pen-size" id="pen-size-label">Pen Size:</label>
+      <input type="range" id="pen-size" min="1" max="10" value="1" />
+      <span id="pen-size-value">1</span>px
+
+      <button id="invert-colors">🔄 Invert Colors</button>
+      <button id="import-bitmap">📥 Import Bitmap</button>
+      <button id="clear-grid">🗑️ Clear Grid</button>
+      <button id="help-button">❓ Help</button>
     </div>
 
     <div id="modes">
-        <button id="mode-fill" class="mode-button active">🖌️ Fill</button>
-        <button id="mode-erase" class="mode-button">🧹 Erase</button>
+      <button id="mode-fill" class="mode-button active">🖌️ Fill</button>
+      <button id="mode-erase" class="mode-button">🧹 Erase</button>
     </div>
 
-    <div id="transform-controls" style="text-align:center; margin-bottom:20px;">
-        <button id="rotate-90">↩️ Rotate 90°</button>
-        <button id="flip-horizontal">↔️ Flip Horizontal</button>
-        <button id="flip-vertical">↕️ Flip Vertical</button>
+    <div
+      id="transform-controls"
+      style="text-align: center; margin-bottom: 20px"
+    >
+      <button id="rotate-90">↩️ Rotate 90°</button>
+      <button id="flip-horizontal">↔️ Flip Horizontal</button>
+      <button id="flip-vertical">↕️ Flip Vertical</button>
     </div>
 
     <div id="grid-container"></div>
-    <button id="generate-code">💾 Generate C++ Code</button>
-    <div id="cpp-code-container" style="display:none;">
+
+    <div id="output-format-container">
+      <label for="output-format" id="output-format-label">Output Format:</label>
+      <select id="output-format">
+        <option value="hex">Hex (0x)</option>
+        <option value="binary">Binary (B)</option>
+      </select>
+
+      <button id="generate-code">💾 Generate C++ Code</button>
+      <div id="cpp-code-container" style="display: none">
         <h2 id="cpp-code-title">📄 Generated C++ Code</h2>
         <button id="generate-bitmap">📋 Copy Code</button>
         <pre id="cpp-code"></pre>
+      </div>
+      <div id="message-container"></div>
+      <div id="links">
+        <a href="https://github.com/fram446742" target="_blank">🐙 GitHub</a>
+      </div>
     </div>
-    <div id="message-container"></div>
-    <div id="links">
-        <a href="https://t.me/rokokoschannel" target="_blank">✈️ Telegram</a>
-        <a href="https://github.com/rokokol" target="_blank">🐙 GitHub</a>
-        <a href="https://www.youtube.com/@ilyushechka" target="_blank">📹 YouTube</a>
-    </div>
-    <div id="star-github">
-        ⭐ If you like this project, please <a href="https://github.com/rokokol/easy-bitmap.github.io" target="_blank">star it on GitHub</a>!
-    </div>
+    <div id="star-github">⭐ If you like this project, please <a href="https://github.com/fram446742/easy-bitmap.github.io" target="_blank">star it on GitHub</a>! Also checkout original project: <a href="https://github.com/rokokol/easy-bitmap.github.io" target="_blank">Original Project</a></div>
 
     <div id="help-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <h2>📖 Help</h2>
-            <p id="help-intro">Welcome to the Easy Bitmap Maker! Here's how to use the tool:</p>
-            <ul id="help-list">
-                <li class="help-fill-mode">🖌️ <strong>Fill Mode:</strong> LMB draws pixels, RMB erases pixels</li>
-                <li class="help-erase-mode">🧹 <strong>Erase Mode:</strong> LMB erases pixels, RMB draws pixels</li>
-                <li class="help-pen-size">🎨 <strong>Pen Size:</strong> Adjust the pen size using the slider</li>
-                <li class="help-import-bitmap">📥 <strong>Import Bitmap:</strong> Import from C++ code. If size differs, it tries to adjust automatically.</li>
-                <li class="help-generate-code">💾 <strong>Generate C++ Code:</strong> View the C++ array</li>
-                <li class="help-copy-code">📋 <strong>Copy Code:</strong> Copy the generated code</li>
-                <li class="help-invert-colors">🔄 <strong>Invert Colors:</strong> Invert all pixels</li>
-                <li class="help-clear-grid">🗑️ <strong>Clear Grid:</strong> Clear all pixels</li>
-                <li class="help-hotkeys">🔑 <strong>Hotkeys:</strong> <strong>D</strong> for Fill, <strong>E</strong> for Erase</li>
-                <li class="help-rotate">↩️ <strong>Rotate 90°:</strong> Rotate the bitmap by 90 degrees clockwise</li>
-                <li class="help-flip-h">↔️ <strong>Flip Horizontal:</strong> Flip the bitmap horizontally</li>
-                <li class="help-flip-v">↕️ <strong>Flip Vertical:</strong> Flip the bitmap vertically</li>
-                <li class="help-language">🌐 <strong>Language:</strong> Toggle between English and Russian</li>
-                <li class="help-support">⭐ <strong>Support:</strong> If you like this project, star it on GitHub</li>
-            </ul>
-            <p id="help-outro">Happy creating!</p>
-        </div>
+      <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h2>📖 Help</h2>
+        <p id="help-intro">
+          Welcome to the Easy Bitmap Maker! Here's how to use the tool:
+        </p>
+        <ul id="help-list">
+          <li class="help-fill-mode">
+            🖌️ <strong>Fill Mode:</strong> LMB draws pixels, RMB erases pixels
+          </li>
+          <li class="help-erase-mode">
+            🧹 <strong>Erase Mode:</strong> LMB erases pixels, RMB draws pixels
+          </li>
+          <li class="help-pen-size">
+            🎨 <strong>Pen Size:</strong> Adjust the pen size using the slider
+          </li>
+          <li class="help-import-bitmap">
+            📥 <strong>Import Bitmap:</strong> Import from C++ code. If size
+            differs, it tries to adjust automatically.
+          </li>
+          <li class="help-generate-code">
+            💾 <strong>Generate C++ Code:</strong> View the C++ array
+          </li>
+          <li class="help-copy-code">
+            📋 <strong>Copy Code:</strong> Copy the generated code
+          </li>
+          <li class="help-invert-colors">
+            🔄 <strong>Invert Colors:</strong> Invert all pixels
+          </li>
+          <li class="help-clear-grid">
+            🗑️ <strong>Clear Grid:</strong> Clear all pixels
+          </li>
+          <li class="help-hotkeys">
+            🔑 <strong>Hotkeys:</strong> <strong>D</strong> for Fill,
+            <strong>E</strong> for Erase
+          </li>
+          <li class="help-rotate">
+            ↩️ <strong>Rotate 90°:</strong> Rotate the bitmap by 90 degrees
+            clockwise
+          </li>
+          <li class="help-flip-h">
+            ↔️ <strong>Flip Horizontal:</strong> Flip the bitmap horizontally
+          </li>
+          <li class="help-flip-v">
+            ↕️ <strong>Flip Vertical:</strong> Flip the bitmap vertically
+          </li>
+          <li class="help-language">
+            🌐 <strong>Language:</strong> Toggle between English and Russian
+          </li>
+          <li class="help-support">
+            ⭐ <strong>Support:</strong> If you like this project, star it on
+            GitHub
+          </li>
+        </ul>
+        <p id="help-outro">Happy creating!</p>
+      </div>
     </div>
 
     <div id="import-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <h2 id="import-title">📥 Import Bitmap</h2>
-            <p id="import-instr">Paste your C++ bitmap code or array content below:</p>
-            <textarea id="import-textarea" placeholder="e.g., 0x00, 0xFF, 0xAA"></textarea>
-            <button id="import-confirm">📥 Import</button>
-        </div>
+      <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h2 id="import-title">📥 Import Bitmap</h2>
+        <p id="import-instr">
+          Paste your C++ bitmap code or array content below:
+        </p>
+        <textarea
+          id="import-textarea"
+          placeholder="e.g., 0x00, 0xFF, 0xAA"
+        ></textarea>
+        <button id="import-confirm">📥 Import</button>
+      </div>
     </div>
 
     <div id="copy-success-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <h2 id="copy-success-title">✅ Success</h2>
-            <p id="copy-success-text">Code copied to clipboard!</p>
-        </div>
+      <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h2 id="copy-success-title">✅ Success</h2>
+        <p id="copy-success-text">Code copied to clipboard!</p>
+      </div>
     </div>
 
     <div id="message-modal" class="modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <h2 id="message-modal-title"></h2>
-            <p id="message-modal-text"></p>
-            <button id="message-ok-button" class="message-ok-button">OK</button>
-        </div>
+      <div class="modal-content">
+        <span class="close-button">&times;</span>
+        <h2 id="message-modal-title"></h2>
+        <p id="message-modal-text"></p>
+        <button id="message-ok-button" class="message-ok-button">OK</button>
+      </div>
     </div>
 
+    <script src="strings.js"></script>
     <script src="script.js"></script>
-</body>
+  </body>
 </html>
-
